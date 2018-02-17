@@ -91,6 +91,9 @@ class Table(object):
     def get_column(self, column_name):
         return self.columns[column_name]
 
+    def get_column_list(self):
+        return list(self.columns.keys())
+
     def generate_hash(self, output_file, alias_char, hash_key):
         if len(self.bk_columns) > 1:
             output_file.write('    , CONCAT(\n')

@@ -28,6 +28,12 @@ class Schema(object):
     def get_table(self, table_name):
         return self.tables[table_name]
 
+    def count_tables(self):
+        return len(self.tables)
+
+    def get_tables(self):
+        return list(self.tables.values())
+
     def generate_selects(self, output_dir):
         try:
             os.makedirs(output_dir)
