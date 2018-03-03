@@ -1,0 +1,67 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html ng-app="DatabookApp">
+  <head>
+    <title>Datavault 2 web tool</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+    <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
+  </head>
+
+<body>
+<div class="container-full">
+
+  <nav class="navbar navbar-default" role="navigation">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" ng-click="isNavCollapsed = !isNavCollapsed">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="{% url 'webtool:index' %}"><img src="{% static 'images/logo.png' %}" style="width: 20px; height:20px; float:left; margin: 0px; margin-right: 4px;"><span>Datavault 2 web tool</span></a>
+    </div>
+    <div class="collapse navbar-collapse" uib-collapse="isNavCollapsed" ng-controller="MasterController">
+      <ul class="nav navbar-nav">
+        <li><a href="{% url 'webtool:index' %}">Home</a></li>
+        <li>
+          <div class="btn-group" uib-dropdown is-open="menustatus.is_tools_open">
+            <button id="single-button" type="button" class="btn" uib-dropdown-toggle ng-disabled="disabled">
+              Tools<span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="single-button">
+              <li role="menuitem"><a href="{% url 'webtool:index' %}')">Do something</a></li>
+            </ul>
+          </div>
+        </li>
+        <!-- <li>
+          <form class="navbar-form" role="search">
+            <div class="input-group add-on">
+              <input class="form-control" placeholder="Search all data" name="srch-term" id="srch-term" type="text">
+              <div class="input-group-btn">
+                <button class="btn btn-default" type="submit"><i class="fa fa-search" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </form>
+        </li> -->
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+      </ul>
+    </div>
+  </nav>
+
+  {# store the jinja2 context for form_rules rendering logic #}
+  {% block body %}
+    {{ content }}
+  {% endblock %}
+
+{% url 'webtool:index' %}
+
+</div>
+    <script src="{% static 'js/angular.min.js' %}"></script>
+    <script src="{% static 'js/ui-bootstrap-tpls-2.5.0.min.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>

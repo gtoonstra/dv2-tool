@@ -6,6 +6,7 @@ from . import views
 router = routers.DefaultRouter()
 router.register(r'questions', views.QuestionViewSet)
 
+app_name = 'webtool'
 
 urlpatterns = [
     path('api/v1.0/', include(router.urls)),
