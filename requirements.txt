@@ -4,7 +4,11 @@
 #
 #    pip-compile --output-file requirements.txt requirements.in
 #
-npyscreen==4.10.5
+django-filter==1.1.0
+django==2.0
+djangorestframework==3.7.7
+markdown==2.6.11
 psycopg2==2.7.4
+pytz==2018.3              # via django
 sqlalchemy-utc==0.10.0
 sqlalchemy==1.1.15

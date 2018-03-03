@@ -1,4 +1,7 @@
-npyscreen>=4.10.5
+django==2.0
+django-filter
+djangorestframework==3.7.7
+markdown==2.6.11
 psycopg2>=2.7.4
 sqlalchemy>=1.1.15, <1.2.0
 sqlalchemy-utc>=0.9.0
