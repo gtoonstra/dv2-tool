@@ -94,6 +94,14 @@ class Table(object):
     def get_column_list(self):
         return list(self.columns.keys())
 
+    def set_selected(self, col_list):
+        self.selected = col_list
+
+    def set_business_keys(self, col_list):
+        self.bk_columns = []
+        for col in col_list:
+            self.bk_columns.append(self.get_column(col))
+
     def generate_hash(self, output_file, alias_char, hash_key):
         if len(self.bk_columns) > 1:
             output_file.write('    , CONCAT(\n')
@@ -126,6 +134,8 @@ class Table(object):
             f.write('SELECT\n')
 
             for column_name, column in self.columns.items():
+                if column_name not in self.selected:
+                    continue
                 column.generate_select(f, alias_char)
 
             self.generate_hash(f, alias_char, 'hkey_{0}'.format(self.name))

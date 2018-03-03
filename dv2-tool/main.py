@@ -64,7 +64,7 @@ class ConfigForm(npyscreen.ActionForm):
         self.database.value = self.parentApp.database
         self.user.value = self.parentApp.user
         self.pw.value = self.parentApp.pw
-self.add(npyscreen.TitleText, name = "Output dir:",)        self.output_dir = self.parentApp.output_dir
+        self.output_dir = self.parentApp.output_dir
 
     def on_ok(self):
         self.parentApp.switchFormPrevious()
@@ -101,15 +101,17 @@ class EditStagingForm(npyscreen.ActionForm):
         self.schema = self.add(npyscreen.TitleFixedText, name = "Schema:",)
         self.table_field = self.add(npyscreen.TitleFixedText, name = "Table:",)
         self.selected_cols = self.add(npyscreen.TitleMultiSelect, name = "Selected cols:",)
-        self.business_key = self.add(npyscreen.TitleMultiSelect, name = "Business keys:",)
+        #self.business_key = self.add(npyscreen.TitleMultiSelect, name = "Business keys:",)
 
     def beforeEditing(self):
         self.schema.value = self.table.schema.name
         self.table_field.value = self.table.name
         self.selected_cols.values = self.table.get_column_list()
-        self.business_key.values = self.table.get_column_list()
+        #self.business_key.values = self.table.get_column_list()
 
     def on_ok(self):
+        self.table.set_selected(self.selected_cols.value)
+        # self.table.set_business_keys(self.business_key.value)
         self.parentApp.switchFormPrevious()
 
     def on_cancel(self):
