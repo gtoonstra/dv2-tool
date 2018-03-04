@@ -11,9 +11,20 @@
         </select>
         <br/><br/>
         <ul>
-          <li ng-repeat="table in tables">{% verbatim %}{{table}}{% endverbatim %}</li>
+          <li ng-repeat="table in filteredTables"><a href ng-click="selectTable(table.id)">{% verbatim %}{{table.name}}{% endverbatim %}</a></li>
         </ul>
         <ul uib-pagination total-items="totalItems" items-per-page="numPerPage" ng-model="currentPage" ng-change="pageChanged()"></ul>
+        
+        <h4>{% verbatim %}{{selectedSchema}}.{{selectedTable.name}}{% endverbatim %}</h4>
+        <table>
+          <tr ng-repeat="column in selectedTable.columns">
+            <td>{% verbatim %}{{column.name}}{% endverbatim %}</td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+        </table>
+
         <h4 ng-bind="information"></h4>
         <h4 ng-bind="error"></h4>
       </div>

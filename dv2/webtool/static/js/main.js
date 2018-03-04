@@ -58,16 +58,18 @@
         $scope.schemas = []
         $scope.selectedSchema = ""
         $scope.tables = []
+        $scope.columns = []
         $scope.filteredTables = []
         $scope.currentPage = 1
         $scope.totalItems = 0
-        $scope.numPerPage = 10
+        $scope.numPerPage = 5
         $scope.information = ""
         $scope.error = ""
+        $scope.selectedTable = null
 
         $scope.pageChanged = function() {
             var begin = (($scope.currentPage - 1) * $scope.numPerPage)
-            end = begin + $scope.numPerPage
+            var end = begin + $scope.numPerPage
             $scope.filteredTables = $scope.tables.slice(begin, end)
         };
 
@@ -90,7 +92,7 @@
         $scope.selectSchema = function() {
           $scope.information = "Retrieving..."
           $scope.tables.length = 0
-          $http.get('/api/v1.0/schemas/' + $scope.selectedSchema + '/table_names/').
+          $http.get('/api/v1.0/schemas/' + $scope.selectedSchema + '/tables/').
             then(function successCallback(response) {
                 $scope.information = "Success!"
                 $scope.error = ""
@@ -98,6 +100,21 @@
                     $scope.tables.push(value)
                 })
                 $scope.totalItems = $scope.tables.length
+                $scope.pageChanged()
+            },
+            function errorCallback(error) {
+                $scope.error = error.data['message']
+            });
+        };
+
+        $scope.selectTable = function(tableid) {
+          $scope.information = "Retrieving..."
+          $scope.columns.length = 0
+          $http.get('/api/v1.0/tables/' + tableid + '/').
+            then(function successCallback(response) {
+                $scope.information = "Success!"
+                $scope.error = ""
+                $scope.selectedTable = response.data
             },
             function errorCallback(error) {
                 $scope.error = error.data['message']

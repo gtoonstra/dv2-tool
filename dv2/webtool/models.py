@@ -6,16 +6,13 @@ class Schema(models.Model):
 
 
 class Table(models.Model):
-    name = models.CharField(max_length=200, primary_key=True)
+    name = models.CharField(max_length=200)
     schema = models.ForeignKey(Schema, related_name='tables', on_delete=models.CASCADE)
-    target_schema = models.CharField(max_length=200)
-    target_table = models.CharField(max_length=200)
-    alias = models.CharField(max_length=200)
 
 
 class Column(models.Model):
-    table = models.ForeignKey(Table, on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
+    table = models.ForeignKey(Table, related_name='columns', on_delete=models.CASCADE)
     nullable = models.BooleanField(default=True)
     primary_key = models.BooleanField(default=True)
     alias = models.CharField(max_length=200)

@@ -5,13 +5,15 @@ from rest_framework import serializers
 class ColumnSerializer(serializers.ModelSerializer):
     class Meta:
         model = Column
-        fields = ('name', 'nullable', 'primary_key', 'alias')
+        fields = ('id', 'name', 'nullable', 'primary_key', 'alias')
 
 
 class TableSerializer(serializers.ModelSerializer):
+    columns = ColumnSerializer(many=True, read_only=True)
+
     class Meta:
         model = Table
-        fields = ('schema', 'name', 'target_schema', 'target_table', 'alias')
+        fields = ('id', 'schema', 'name', 'columns')
 
 
 class SchemaSerializer(serializers.ModelSerializer):

@@ -38,3 +38,9 @@ class SchemaManager(object):
         for schema_name, schema in self.schemas.items():
             schema.resolve_foreign_keys(self.schemas)
             schema.guess_business_keys()
+
+    def get_schemas(self):
+        return self.schemas.keys()
+
+    def get_schema(self, schema_name):
+        return self.schemas[schema_name]

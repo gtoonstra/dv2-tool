@@ -29,13 +29,13 @@ class SchemaViewSet(viewsets.ModelViewSet):
     serializer_class = SchemaSerializer
 
     @detail_route()
-    def table_names(self, request, pk=None):
+    def tables(self, request, pk=None):
         """
         Returns a list of all the table names that the schema owns.
         """
         schema = self.get_object()
         tables = schema.tables.all()
-        return Response([table.name for table in tables])
+        return Response([{"id": table.id, "name": table.name} for table in tables])
 
 
 class TableViewSet(viewsets.ModelViewSet):
@@ -62,12 +62,48 @@ def tables(request):
 @api_view(['POST'])
 def connect(request):
     """
-    Connect to a source OLTP system
+    Connect to a source OLTP system and parse the schema,
+    then truncate schema with that name and reinsert.
     """
     try:
         schemaManager.parse_schema(request.data)
     except Exception as e:
         logging.exception(e)
         return Response({"result": "ERROR", "message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    schemas = schemaManager.get_schemas()
+    for schema_name in schemas:
+        schema = schemaManager.get_schema(schema_name)
+
+        model_schema = None
+        try:
+            model_schema = Schema.objects.get(pk=schema_name)
+        except Schema.DoesNotExist:
+            model_schema = Schema.objects.create(name=schema_name)
+        model_schema.save()
+        model_schema.refresh_from_db()
+
+        table_list = schema.get_tables()
+        for table in table_list:
+            model_table = None
+            try:
+                model_table = Table.objects.get(name=table.name, schema=model_schema)
+            except Table.DoesNotExist:
+                model_table = Table.objects.create(name=table.name, schema=model_schema)
+            model_table.save()
+            model_table.refresh_from_db()
+
+            column_list = table.get_column_list()
+            for column_name in column_list:
+                column = table.get_column(column_name)
+                model_column = None
+                try:
+                    model_column = Column.objects.get(name=column.name, table=model_table)
+                except Column.DoesNotExist:
+                    model_column = Column.objects.create(name=column.name, table=model_table)
+                model_column.nullable = column.nullable
+                model_column.primary_key = column.primary_key
+                model_column.alias = column.alias
+                model_column.save()
 
     return Response('{}', status=status.HTTP_200_OK)
