@@ -2,7 +2,7 @@
 
   'use strict';
 
-  angular.module('DatabookApp', ['ui.bootstrap'])
+  angular.module('DV2App', ['ui.bootstrap'])
 
      .controller('MasterController', ['$scope', '$log', '$http', '$uibModal',
         function($scope, $log, $http, $uibModal) {
@@ -17,149 +17,92 @@
       }
     ])
 
-    .controller('SearchController', ['$scope', '$log', '$http',
-      function($scope, $log, $http) {
+    .controller('ConnectController', ['$scope', '$log', '$http', '$window', 
 
-        $scope.formData = {"searchTerm": "", "nodeType": "person", "csrf_token": 'nil'};
+      function($scope, $log, $http, $window) {
+        $http.defaults.xsrfCookieName = 'csrftoken';
+        $http.defaults.xsrfHeaderName = 'X-CSRFToken';
 
-        $scope.columns = [];
-        $scope.tabledata = [];
-        $scope.isShow = 0;
+        $scope.formData = { 
+            "engine": "postgres", 
+            "host": "localhost", 
+            "port": 5432,
+            "login": "oltp_read",
+            "pass": "oltp_read",
+            "schema": "adventureworks"};
 
-        $scope.getResults = function() {
-          $http.post('/search', JSON.stringify($scope.formData)).
+        $scope.information = ""
+        $scope.error = ""
+
+        $scope.connect = function() {
+          $scope.information = "Connecting..."
+          $http.post('/api/v1.0/connect', JSON.stringify($scope.formData)).
             then(function successCallback(response) {
-                var results = response.data;
-                if ($scope.formData.nodeType == "person") {
-                    $scope.columns = ['name','email','id'];
-                    $scope.tabledata = results;
-                    $scope.isShow = 1;
-                }
-                if ($scope.formData.nodeType == "group") {
-                    $scope.columns = ['name'];
-                    $scope.tabledata = results;
-                    $scope.isShow = 1;
-                }
-                if ($scope.formData.nodeType == "tableau") {
-                    $scope.columns = ['name'];
-                    $scope.tabledata = results;
-                    $scope.isShow = 1;
-                }
-                if ($scope.formData.nodeType == "table") {
-                    $scope.columns = ['name'];
-                    $scope.tabledata = results;
-                    $scope.isShow = 1;
-                }
+                $scope.information = "Success!"
+                $scope.error = ""
+                $window.location.href = '/tables'
             },
             function errorCallback(error) {
-                $log.log(error);
+                $scope.error = error.data['message']
             });
         };
     }
-  ])
-   .controller('PersonController', ['$scope', '$log', '$http',
-      function($scope, $log, $http) {
+  ]).controller('TableController', ['$scope', '$log', '$http', '$window', 
 
-    }
-  ])
-   .controller('GroupController', ['$scope', '$log', '$http', '$window',
       function($scope, $log, $http, $window) {
-        $scope.isFavorite = false;
-        $scope.isEditing = false;
-        $scope.formData = {"groupTitle": '', "group_uuid": '', "groupLink": '', "linkDesc": ''};
+        $http.defaults.xsrfCookieName = 'csrftoken';
+        $http.defaults.xsrfHeaderName = 'X-CSRFToken';
 
-        $scope.setGroup = function(group_uuid, group_name, group_link, link_desc) {
-          $scope.formData['group_uuid'] = group_uuid;
-          $scope.formData['groupTitle'] = group_name;
-          $scope.formData['groupLink'] = group_link;
-          $scope.formData['linkDesc'] = link_desc;
-          if ($scope.formData['group_uuid'] == '-1') {
-            $scope.isEditing = true;
-          }
-        }
+        $scope.formData = {
+        };
+        $scope.schemas = []
+        $scope.selectedSchema = ""
+        $scope.tables = []
+        $scope.filteredTables = []
+        $scope.currentPage = 1
+        $scope.totalItems = 0
+        $scope.numPerPage = 10
+        $scope.information = ""
+        $scope.error = ""
 
-        $scope.favorite = function() {
-          $scope.isFavorite = !$scope.isFavorite;
+        $scope.pageChanged = function() {
+            var begin = (($scope.currentPage - 1) * $scope.numPerPage)
+            end = begin + $scope.numPerPage
+            $scope.filteredTables = $scope.tables.slice(begin, end)
+        };
 
-          $http.post('/favorite_group', {"favorite": $scope.isFavorite, "group_uuid": $scope.formData['group_uuid']}).
+        $scope.refreshSchemas = function() {
+          $scope.information = "Retrieving..."
+          $scope.schemas.length = 0
+          $http.get('/api/v1.0/schemas/').
             then(function successCallback(response) {
+                $scope.information = "Success!"
+                $scope.error = ""
+                angular.forEach(response.data, function (value, key) {
+                    $scope.schemas.push(value['name'])
+                })
             },
             function errorCallback(error) {
-                $log.log(error);
+                $scope.error = error.data['message']
             });
-        }
+        };
 
-        $scope.createGroup = function() {
-          $http.post('/create_group', $scope.formData).
+        $scope.selectSchema = function() {
+          $scope.information = "Retrieving..."
+          $scope.tables.length = 0
+          $http.get('/api/v1.0/schemas/' + $scope.selectedSchema + '/table_names/').
             then(function successCallback(response) {
-              var results = response.data;
-              window.open(results['url'], '_self');
+                $scope.information = "Success!"
+                $scope.error = ""
+                angular.forEach(response.data, function (value, key) {
+                    $scope.tables.push(value)
+                })
+                $scope.totalItems = $scope.tables.length
             },
             function errorCallback(error) {
-                $log.log(error);
-                $window.alert(error.data['error']);
+                $scope.error = error.data['message']
             });
-        }
-
-        $scope.leaveGroup = function(groupUuid) {
-          $log.log(groupUuid);
-          $http.post('/leave_group', {"uuid": groupUuid}).
-            then(function successCallback(response) {
-              var results = response.data;
-              window.open(results['url'], '_self');
-            },
-            function errorCallback(error) {
-                $log.log(error);
-                $window.alert(error.data['error']);
-            }); 
-        }
-
-        $scope.joinGroup = function(groupUuid) {
-          $log.log(groupUuid);
-          $http.post('/join_group', {"uuid": groupUuid}).
-            then(function successCallback(response) {
-              var results = response.data;
-              window.open(results['url'], '_self');
-            },
-            function errorCallback(error) {
-                $log.log(error);
-                $window.alert(error.data['error']);
-            }); 
-        }
-    }
-  ])
-   .controller('TableController', ['$scope', '$log', '$http',
-      function($scope, $log, $http) {
-        $scope.isFavorite = false;
-        $scope.table_uuid = '';
-
-        $scope.favorite = function() {
-          $scope.isFavorite = !$scope.isFavorite;
-
-          $http.post('/favorite_table', {"favorite": $scope.isFavorite, "table_uuid": $scope.table_uuid}).
-            then(function successCallback(response) {
-            },
-            function errorCallback(error) {
-                $log.log(error);
-            });
-        }
-    }
-  ])
-   .controller('ChartController', ['$scope', '$log', '$http',
-      function($scope, $log, $http) {
-        $scope.isFavorite = false;
-        $scope.chart_uuid = '';
-
-        $scope.favorite = function() {
-          $scope.isFavorite = !$scope.isFavorite;
-
-          $http.post('/favorite_chart', {"favorite": $scope.isFavorite, "chart_uuid": $scope.chart_uuid}).
-            then(function successCallback(response) {
-            },
-            function errorCallback(error) {
-                $log.log(error);
-            });
-        }
+        };
     }
   ]);
 

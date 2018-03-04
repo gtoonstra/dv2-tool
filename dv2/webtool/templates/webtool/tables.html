@@ -1,0 +1,21 @@
+{% extends "webtool/master.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+
+    <div class="container" ng-controller="TableController">
+      <div class="container">
+        <button ng-click="refreshSchemas()">Refresh schemas</button>
+        <select ng-model="selectedSchema" ng-options="x for x in schemas" ng-change="selectSchema()">
+        </select>
+        <br/><br/>
+        <ul>
+          <li ng-repeat="table in tables">{% verbatim %}{{table}}{% endverbatim %}</li>
+        </ul>
+        <ul uib-pagination total-items="totalItems" items-per-page="numPerPage" ng-model="currentPage" ng-change="pageChanged()"></ul>
+        <h4 ng-bind="information"></h4>
+        <h4 ng-bind="error"></h4>
+      </div>
+    </div>
+{% endblock %}

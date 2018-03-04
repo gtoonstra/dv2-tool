@@ -1,12 +1,26 @@
 from django.db import models
 
 
-class Question(models.Model):
-    question_text = models.CharField(max_length=200)
-    pub_date = models.DateTimeField('date published')
+class Schema(models.Model):
+    name = models.CharField(max_length=200, primary_key=True)
 
 
-class Choice(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    choice_text = models.CharField(max_length=200)
-    votes = models.IntegerField(default=0)
+class Table(models.Model):
+    name = models.CharField(max_length=200, primary_key=True)
+    schema = models.ForeignKey(Schema, related_name='tables', on_delete=models.CASCADE)
+    target_schema = models.CharField(max_length=200)
+    target_table = models.CharField(max_length=200)
+    alias = models.CharField(max_length=200)
+
+
+class Column(models.Model):
+    table = models.ForeignKey(Table, on_delete=models.CASCADE)
+    name = models.CharField(max_length=200)
+    nullable = models.BooleanField(default=True)
+    primary_key = models.BooleanField(default=True)
+    alias = models.CharField(max_length=200)
+
+
+class ForeignKey(models.Model):
+    src_col = models.ForeignKey(Column, on_delete=models.PROTECT, related_name='src_col')
+    tgt_col = models.ForeignKey(Column, on_delete=models.PROTECT, related_name='tgt_col')
