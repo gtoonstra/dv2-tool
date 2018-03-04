@@ -34,7 +34,7 @@ class SchemaViewSet(viewsets.ModelViewSet):
         Returns a list of all the table names that the schema owns.
         """
         schema = self.get_object()
-        tables = schema.tables.all()
+        tables = schema.tables.all().order_by('name')
         return Response([{"id": table.id, "name": table.name} for table in tables])
 
 
