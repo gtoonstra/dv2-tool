@@ -44,3 +44,4 @@ class SchemaManager(object):
 
     def get_schema(self, schema_name):
         return self.schemas[schema_name]
+

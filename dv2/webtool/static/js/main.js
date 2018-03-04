@@ -17,7 +17,7 @@
       }
     ])
 
-    .controller('ConnectController', ['$scope', '$log', '$http', '$window', 
+    .controller('ParseController', ['$scope', '$log', '$http', '$window', 
 
       function($scope, $log, $http, $window) {
         $http.defaults.xsrfCookieName = 'csrftoken';
@@ -40,14 +40,16 @@
             then(function successCallback(response) {
                 $scope.information = "Success!"
                 $scope.error = ""
-                $window.location.href = '/tables'
+                $window.location.href = '/'
             },
             function errorCallback(error) {
                 $scope.error = error.data['message']
             });
         };
     }
-  ]).controller('TableController', ['$scope', '$log', '$http', '$window', 
+  ])
+
+    .controller('TableController', ['$scope', '$log', '$http', '$window', 
 
       function($scope, $log, $http, $window) {
         $http.defaults.xsrfCookieName = 'csrftoken';
@@ -119,7 +121,7 @@
             });
         };
 
-        $scope.saveBusinessKey = function() {
+        $scope.saveData = function() {
           $scope.information = "Saving..."
 
           angular.forEach($scope.selectedTable.columns, function (value, key) {
@@ -134,7 +136,59 @@
           })
         };
     }
-  ]);
+  ])
+
+    .controller('GenerateController', ['$scope', '$log', '$http', '$window', 
+
+      function($scope, $log, $http, $window) {
+        $http.defaults.xsrfCookieName = 'csrftoken';
+        $http.defaults.xsrfHeaderName = 'X-CSRFToken';
+
+        $scope.formData = { 
+            "engine": "postgres", 
+            "host": "localhost", 
+            "port": 5432,
+            "login": "oltp_read",
+            "pass": "oltp_read",
+            "schema": "adventureworks"};
+        $scope.schemas = []
+        $scope.selectedSchema = ""
+        $scope.information = ""
+        $scope.error = ""
+
+        $scope.refreshSchemas = function() {
+          $scope.information = "Retrieving..."
+          $scope.schemas.length = 0
+          $http.get('/api/v1.0/schemas/').
+            then(function successCallback(response) {
+                $scope.information = "Success!"
+                $scope.error = ""
+                angular.forEach(response.data, function (value, key) {
+                    $scope.schemas.push(value['name'])
+                })
+            },
+            function errorCallback(error) {
+                $scope.error = error.data['message']
+            });
+        };
+
+        $scope.generate = function() {
+          $scope.information = "Generating..."
+
+          $http.post('/api/v1.0/schemas/' + $scope.selectedSchema + '/generate/', JSON.stringify($scope.formData)).
+            then(function successCallback(response) {
+                $scope.information = "Success!"
+                $scope.error = ""
+            },
+            function errorCallback(error) {
+                $scope.error = error.data['message']
+            }
+          );
+        };
+    }
+  ])
+
+  ;
 
 }());
 

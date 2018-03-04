@@ -14,5 +14,6 @@ urlpatterns = [
     path('api/v1.0/', include(router.urls)),
     path('api/v1.0/connect', views.connect),
     path('', views.index, name='index'),
-    path('tables', views.tables, name='tables'),
+    path('parse', views.parse, name='parse'),
+    path('generate', views.generate, name='generate'),
 ]

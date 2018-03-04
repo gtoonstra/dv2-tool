@@ -5,7 +5,7 @@ from rest_framework import serializers
 class ColumnSerializer(serializers.ModelSerializer):
     class Meta:
         model = Column
-        fields = ('id', 'name', 'nullable', 'primary_key', 'business_key')
+        fields = ('id', 'name', 'nullable', 'primary_key', 'business_key', 'select')
 
 
 class TableSerializer(serializers.ModelSerializer):

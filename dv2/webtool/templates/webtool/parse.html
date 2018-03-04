@@ -1,0 +1,41 @@
+{% extends "webtool/master.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+
+    <div class="container" ng-controller="ParseController">
+      <div class="container">
+        <h1>Connect to source system</h1>
+        <form ng-submit="connect()">
+          <div class="form-group">
+            <table>
+                <tr>
+                <td>Engine:</td><td><input type="text" ng-model="formData.engine" required></td>
+                </tr>
+                <tr>
+                <td>Host:</td><td><input type="text" ng-model="formData.host" required></td>
+                </tr>
+                <tr>
+                <td>Port:</td><td><input type="text" ng-model="formData.port" required></td>
+                </tr>
+                <tr>
+                <td>Login:</td><td><input type="text" ng-model="formData.login" required></td>
+                </tr>
+                <tr>
+                <td>Pass:</td><td><input type="text" ng-model="formData.pass" required></td>
+                </tr>
+                <tr>
+                <td>Schema:</td><td><input type="text" ng-model="formData.schema" required></td>
+                </tr>
+            </table>
+          </div>
+          <button type="submit" class="btn btn-default">Connect</button>
+        </form>
+        <br>
+        <h4 ng-bind="information"></h4>
+        <h4 ng-bind="error"></h4>
+      </div>
+    </div>
+{% endblock %}
+

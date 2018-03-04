@@ -10,6 +10,7 @@ from .serializers import TableSerializer
 from .serializers import ColumnSerializer
 from .schema_manager import SchemaManager
 import logging
+import os
 
 from .models import Schema, Table, Column, ForeignKey
 
@@ -37,6 +38,23 @@ class SchemaViewSet(viewsets.ModelViewSet):
         tables = schema.tables.all().order_by('name')
         return Response([{"id": table.id, "name": table.name} for table in tables])
 
+    @detail_route(methods=['post'])
+    def generate(self, request, pk=None):
+        schema = self.get_object()
+        output_dir = request.data['output_dir']
+        schema_output_dir = os.path.join(output_dir, schema.name)
+
+        try:
+            os.makedirs(schema_output_dir)
+        except OSError:
+            pass
+
+        for table in schema.tables.all():
+            file_name = os.path.join(schema_output_dir, "{0}.sql".format(table.name))
+            table.generate_select(file_name)
+
+        return Response('{}', status=status.HTTP_200_OK)
+
 
 class TableViewSet(viewsets.ModelViewSet):
     """
@@ -56,12 +74,13 @@ class ColumnViewSet(viewsets.ModelViewSet):
     def update(self, request, pk):
         instance = Column.objects.get(id=pk)
         instance.business_key = request.data.get('business_key', instance.business_key)
+        instance.select = request.data.get('select', instance.select)
         instance.save()
         return Response('{}', status=status.HTTP_200_OK)
 
-def tables(request):
+def parse(request):
     context = {}
-    return render(request, 'webtool/tables.html', context)
+    return render(request, 'webtool/parse.html', context)
 
 
 @api_view(['POST'])
@@ -108,7 +127,7 @@ def connect(request):
                     model_column = Column.objects.create(name=column.name, table=model_table)
                 model_column.nullable = column.nullable
                 model_column.primary_key = column.primary_key
-                model_column.alias = column.alias
+                model_column.select = column.select
                 model_column.save()
 
     for schema_name in schemas:
@@ -138,3 +157,8 @@ def connect(request):
                     fk.save()
 
     return Response('{}', status=status.HTTP_200_OK)
+
+
+def generate(request):
+    context = {}
+    return render(request, 'webtool/generate.html', context)

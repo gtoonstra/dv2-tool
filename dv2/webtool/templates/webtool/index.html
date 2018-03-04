@@ -4,35 +4,36 @@
 
 {% block body %}
 
-    <div class="container" ng-controller="ConnectController">
+    <div class="container" ng-controller="TableController">
       <div class="container">
-        <h1>Connect to source system</h1>
-        <form ng-submit="connect()">
-          <div class="form-group">
-            <table>
-                <tr>
-                <td>Engine:</td><td><input type="text" ng-model="formData.engine" required></td>
-                </tr>
-                <tr>
-                <td>Host:</td><td><input type="text" ng-model="formData.host" required></td>
-                </tr>
-                <tr>
-                <td>Port:</td><td><input type="text" ng-model="formData.port" required></td>
-                </tr>
-                <tr>
-                <td>Login:</td><td><input type="text" ng-model="formData.login" required></td>
-                </tr>
-                <tr>
-                <td>Pass:</td><td><input type="text" ng-model="formData.pass" required></td>
-                </tr>
-                <tr>
-                <td>Schema:</td><td><input type="text" ng-model="formData.schema" required></td>
-                </tr>
-            </table>
-          </div>
-          <button type="submit" class="btn btn-default">Connect</button>
-        </form>
-        <br>
+        <button ng-click="refreshSchemas()">Refresh schemas</button>
+        <select ng-model="selectedSchema" ng-options="x for x in schemas" ng-change="selectSchema()">
+        </select>
+        <br/><br/>
+        <ul>
+          <li ng-repeat="table in filteredTables"><a href ng-click="selectTable(table.id)">{% verbatim %}{{table.name}}{% endverbatim %}</a></li>
+        </ul>
+        <ul uib-pagination total-items="totalItems" items-per-page="numPerPage" ng-model="currentPage" ng-change="pageChanged()"></ul>
+        
+        <h4>{% verbatim %}{{selectedSchema}}.{{selectedTable.name}}{% endverbatim %}</h4>
+        <table class="table">
+          <tr>
+            <th>Name</th>
+            <th>Nullable</th>
+            <th>Primary key</th>
+            <th>Business key</th>
+            <th>Select</th>
+          </tr>
+          <tr ng-repeat="column in selectedTable.columns">
+            <td>{% verbatim %}{{column.name}}{% endverbatim %}</td>
+            <td><input type="checkbox" ng-model="column.nullable" disabled></td>
+            <td><input type="checkbox" ng-model="column.primary_key" disabled></td>
+            <td><input type="checkbox" ng-model="column.business_key"></td>
+            <td><input type="checkbox" ng-model="column.select"></td>
+          </tr>
+        </table>
+        <button ng-click="saveData()">Save data</button>
+
         <h4 ng-bind="information"></h4>
         <h4 ng-bind="error"></h4>
       </div>

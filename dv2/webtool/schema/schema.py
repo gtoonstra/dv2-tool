@@ -33,13 +33,3 @@ class Schema(object):
 
     def get_tables(self):
         return list(self.tables.values())
-
-    def generate_selects(self, output_dir):
-        try:
-            os.makedirs(output_dir)
-        except OSError:
-            pass
-
-        for table_name, table in self.tables.items():
-            file_name = os.path.join(output_dir, "{0}.sql".format(table_name))
-            table.generate_select(file_name)

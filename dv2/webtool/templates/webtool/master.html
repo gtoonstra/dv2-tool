@@ -31,7 +31,8 @@
               Tools<span class="caret"></span>
             </button>
             <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="single-button">
-              <li role="menuitem"><a href="{% url 'webtool:index' %}')">Do something</a></li>
+              <li role="menuitem"><a href="{% url 'webtool:parse' %}">Parse source system</a></li>
+              <li role="menuitem"><a href="{% url 'webtool:generate' %}">Generate source code</a></li>
             </ul>
           </div>
         </li>
@@ -45,8 +46,6 @@
   {% block body %}
     {{ content }}
   {% endblock %}
-
-{% url 'webtool:index' %}
 
 </div>
     <script src="{% static 'js/angular.min.js' %}"></script>
