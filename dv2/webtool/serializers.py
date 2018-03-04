@@ -1,11 +1,11 @@
-from .models import Schema, Table, Column
+from .models import Schema, Table, Column, ForeignKey
 from rest_framework import serializers
 
 
 class ColumnSerializer(serializers.ModelSerializer):
     class Meta:
         model = Column
-        fields = ('id', 'name', 'nullable', 'primary_key', 'alias')
+        fields = ('id', 'name', 'nullable', 'primary_key', 'business_key')
 
 
 class TableSerializer(serializers.ModelSerializer):

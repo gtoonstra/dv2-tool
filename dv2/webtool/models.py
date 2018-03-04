@@ -15,9 +15,10 @@ class Column(models.Model):
     table = models.ForeignKey(Table, related_name='columns', on_delete=models.CASCADE)
     nullable = models.BooleanField(default=True)
     primary_key = models.BooleanField(default=True)
-    alias = models.CharField(max_length=200)
+    business_key = models.BooleanField(default=False)
 
 
 class ForeignKey(models.Model):
     src_col = models.ForeignKey(Column, on_delete=models.PROTECT, related_name='src_col')
     tgt_col = models.ForeignKey(Column, on_delete=models.PROTECT, related_name='tgt_col')
+    constraint_name = models.CharField(max_length=200)

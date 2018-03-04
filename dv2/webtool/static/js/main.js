@@ -58,7 +58,6 @@
         $scope.schemas = []
         $scope.selectedSchema = ""
         $scope.tables = []
-        $scope.columns = []
         $scope.filteredTables = []
         $scope.currentPage = 1
         $scope.totalItems = 0
@@ -109,7 +108,6 @@
 
         $scope.selectTable = function(tableid) {
           $scope.information = "Retrieving..."
-          $scope.columns.length = 0
           $http.get('/api/v1.0/tables/' + tableid + '/').
             then(function successCallback(response) {
                 $scope.information = "Success!"
@@ -119,6 +117,21 @@
             function errorCallback(error) {
                 $scope.error = error.data['message']
             });
+        };
+
+        $scope.saveBusinessKey = function() {
+          $scope.information = "Saving..."
+
+          angular.forEach($scope.selectedTable.columns, function (value, key) {
+              $http.put('/api/v1.0/columns/' + value.id + '/', value).
+                then(function successCallback(response) {
+                    $scope.information = "Success!"
+                    $scope.error = ""
+                },
+                function errorCallback(error) {
+                    $scope.error = error.data['message']
+                });
+          })
         };
     }
   ]);

@@ -11,7 +11,7 @@ from .serializers import ColumnSerializer
 from .schema_manager import SchemaManager
 import logging
 
-from .models import Schema, Table, Column
+from .models import Schema, Table, Column, ForeignKey
 
 
 schemaManager = SchemaManager()
@@ -53,6 +53,11 @@ class ColumnViewSet(viewsets.ModelViewSet):
     queryset = Column.objects.all()
     serializer_class = ColumnSerializer
 
+    def update(self, request, pk):
+        instance = Column.objects.get(id=pk)
+        instance.business_key = request.data.get('business_key', instance.business_key)
+        instance.save()
+        return Response('{}', status=status.HTTP_200_OK)
 
 def tables(request):
     context = {}
@@ -105,5 +110,31 @@ def connect(request):
                 model_column.primary_key = column.primary_key
                 model_column.alias = column.alias
                 model_column.save()
+
+    for schema_name in schemas:
+        schema = schemaManager.get_schema(schema_name)
+        model_schema = Schema.objects.get(pk=schema_name)
+        table_list = schema.get_tables()
+        for table in table_list:
+            model_table = Table.objects.get(name=table.name, schema=model_schema)
+            foreign_keys = table.get_foreign_keys()
+
+            for constraint_name, fkey in foreign_keys.items():
+                src_schema = Schema.objects.get(pk=fkey.src_schema)
+                tgt_schema = Schema.objects.get(pk=fkey.tgt_schema)
+                src_table = Table.objects.get(name=fkey.src_table, schema=src_schema)
+                tgt_table = Table.objects.get(name=fkey.tgt_table, schema=tgt_schema)
+                for src_col_name, tgt_col_name in zip(fkey.src_columns, fkey.tgt_columns):
+                    src_col = Column.objects.get(name=src_col_name, table=src_table)
+                    tgt_col = Column.objects.get(name=tgt_col_name, table=tgt_table)
+
+                    fk = None
+                    try:
+                        fk = ForeignKey.objects.get(src_col=src_col, tgt_col=tgt_col)
+                    except ForeignKey.DoesNotExist:
+                        fk = ForeignKey.objects.create(src_col=src_col, tgt_col=tgt_col)
+
+                    fk.constraint_name = constraint_name
+                    fk.save()
 
     return Response('{}', status=status.HTTP_200_OK)

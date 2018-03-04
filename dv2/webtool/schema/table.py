@@ -83,6 +83,9 @@ class Table(object):
             else:
                 self.hash_keys[constraint_name] = 'hkey_{0}_{1}'.format(key.tgt_table, key.src_columns[0])
 
+    def get_foreign_keys(self):
+        return self.foreign_keys
+
     def guess_business_keys(self):
         for column_name, column in self.columns.items():
             if column.primary_key:
