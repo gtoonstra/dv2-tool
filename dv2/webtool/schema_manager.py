@@ -1,6 +1,10 @@
 from sqlalchemy import create_engine
 from sqlalchemy.engine import reflection
 from webtool.schema import Schema
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class SchemaManager(object):
@@ -17,12 +21,6 @@ class SchemaManager(object):
         for schema_name, schema in self.schemas.items():
             count += schema.count_tables()
         return count
-
-    def get_tables(self):
-        tables = []
-        for schema_name, schema in self.schemas.items():
-            tables += schema.get_tables()
-        return tables
 
     def parse_schema(self, login_details):
         engine = create_engine(self._get_engine_url(login_details))

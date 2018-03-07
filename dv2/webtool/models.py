@@ -91,7 +91,6 @@ class Table(models.Model):
     def generate_hash(self, output_file, alias_char, hash_key):
         if len(self.bk_columns) == 0:
             for column in self.columns.all():
-                logging.info(column.name)
                 if not column.select:
                     continue
                 if column.business_key:
@@ -124,7 +123,7 @@ class Table(models.Model):
                 hash_key))
 
         if len(self.bk_columns) > 1:
-            output_file.write('      ) as hash_key_{0}\n'.format(hash_key))
+            output_file.write('      ) as {0}\n'.format(hash_key))
 
     def generate_select_foreign_keys(self, output_file, last_alias_char):
         new_alias_char = last_alias_char

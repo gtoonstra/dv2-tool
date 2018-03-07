@@ -15,6 +15,7 @@ import os
 from .models import Schema, Table, Column, ForeignKey
 
 
+logger = logging.getLogger(__name__)
 schemaManager = SchemaManager()
 
 
@@ -127,7 +128,6 @@ def connect(request):
                     model_column = Column.objects.create(name=column.name, table=model_table)
                 model_column.nullable = column.nullable
                 model_column.primary_key = column.primary_key
-                model_column.select = column.select
                 model_column.save()
 
     for schema_name in schemas:

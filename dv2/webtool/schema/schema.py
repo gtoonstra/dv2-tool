@@ -1,6 +1,10 @@
 from .table import Table
 from sqlalchemy import MetaData
 import os
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class Schema(object):
@@ -9,10 +13,14 @@ class Schema(object):
         self.tables = {}
 
     def parse(self, engine):
-        meta = MetaData(bind=engine, schema=self.name)
-        meta.reflect()
+        meta = MetaData(bind=engine)
+        meta.clear()
+        meta.reflect(schema=self.name)
 
         for table_ref in meta.sorted_tables:
+            if table_ref.schema != self.name:
+                # This is a table imported through a foreign key
+                continue
             table_name = table_ref.name
             self.tables[table_name] = Table(table_name, self)
             self.tables[table_name].parse(table_ref, engine)
