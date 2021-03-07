@@ -5,3 +5,4 @@ markdown==2.6.11
 psycopg2>=2.7.4
 sqlalchemy>=1.1.15, <1.2.0
 sqlalchemy-utc>=0.9.0
+pytest=6.0.0
